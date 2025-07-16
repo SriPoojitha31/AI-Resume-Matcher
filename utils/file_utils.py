@@ -16,31 +16,32 @@ def list_files_in_directory(directory, extensions=None):
     return files
 
 # --- NER Extraction using spaCy ---
+import spacy
+import subprocess
+import sys
+
 def extract_entities_from_text(text):
-    import spacy
-    nlp = spacy.load('en_core_web_sm')
+    try:
+        nlp = spacy.load('en_core_web_sm')
+    except OSError:
+        # Try to download the model if not present
+        try:
+            subprocess.run([sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm', '--user'], check=True)
+            nlp = spacy.load('en_core_web_sm')
+        except Exception as e:
+            raise RuntimeError(f"Could not load or download spaCy model: {e}")
     doc = nlp(text)
     skills = set()
     experience = set()
-    locations = set()
-    # Simple rule-based extraction for demo
+    location = set()
     for ent in doc.ents:
-        if ent.label_ in ["ORG", "SKILL"]:
+        if ent.label_ in ["SKILL", "SKILLS"]:
             skills.add(ent.text)
-        elif ent.label_ in ["DATE", "TIME"]:
+        elif ent.label_ in ["EXPERIENCE", "DATE"]:
             experience.add(ent.text)
-        elif ent.label_ in ["GPE", "LOC"]:
-            locations.add(ent.text)
-    # Add keyword-based skill extraction (very basic)
-    skill_keywords = ["python", "java", "sql", "excel", "machine learning", "deep learning", "nlp", "data analysis", "project management", "communication", "leadership"]
-    for kw in skill_keywords:
-        if kw in text.lower():
-            skills.add(kw)
-    return {
-        "skills": list(skills),
-        "experience": list(experience),
-        "location": list(locations)
-    }
+        elif ent.label_ in ["GPE", "LOC", "LOCATION"]:
+            location.add(ent.text)
+    return {"skills": list(skills), "experience": list(experience), "location": list(location)}
 
 # --- Extract skill keywords from JD text ---
 def extract_skills_from_jd(jd_text):
