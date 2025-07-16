@@ -12,6 +12,38 @@ A hackathon-ready MVP that matches resumes to job descriptions using AI, with a 
 - Analytics dashboard for employers
 - Modern dark UI
 
+---
+
+## 🚀 Deployment Guide
+
+### 1. **Streamlit Community Cloud (streamlit.io)**
+- **Push your code to GitHub.**
+- Go to [Streamlit Cloud](https://share.streamlit.io/) and connect your repo.
+- **Requirements:**
+  - `requirements.txt` must be present in the repo root.
+  - If you use BERT, add a startup script to download the model (see below) or use TF-IDF only for zero-setup.
+- **Optional: Add a `secrets.toml` file** if you need to store API keys or config (not required for basic use).
+- **Note:** Streamlit Cloud will install all dependencies and run `streamlit run app.py` automatically.
+
+#### Example: Download BERT model on startup (add to `app.py` top):
+```python
+import os
+from sentence_transformers import SentenceTransformer
+if not os.path.exists('models/all-MiniLM-L6-v2'):
+    model = SentenceTransformer('all-MiniLM-L6-v2')
+    model.save('models/all-MiniLM-L6-v2')
+```
+
+### 2. **Docker Deployment (Any Cloud or Local Server)**
+- Build and run as described below (see Docker Usage).
+- For offline BERT, pre-populate the `models/` directory as described.
+
+### 3. **Generic Cloud VM or Bare Metal**
+- SSH to your server, clone the repo, and follow the local install instructions.
+- Make sure to open port 8501 (or your chosen port) in your firewall/security group.
+
+---
+
 ## How to Run (Locally)
 1. **Create and activate a virtual environment**
 2. **Install dependencies:**
