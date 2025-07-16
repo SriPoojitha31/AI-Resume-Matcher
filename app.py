@@ -17,8 +17,24 @@ def extract_entities_from_text(text):
             subprocess.run([sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm', '--user'], check=True)
             nlp = spacy.load('en_core_web_sm')
         except Exception as e:
-            raise RuntimeError(f"Could not load or download spaCy model: {e}")
-    # ... rest of your function ...
+            return {"skills": [], "experience": [], "location": []}
+    try:
+        doc = nlp(text)
+        skills = set()
+        experience = set()
+        location = set()
+        for ent in doc.ents:
+            if ent.label_ in ["SKILL", "SKILLS"]:
+                skills.add(ent.text)
+            elif ent.label_ in ["EXPERIENCE", "DATE"]:
+                experience.add(ent.text)
+            elif ent.label_ in ["GPE", "LOC", "LOCATION"]:
+                location.add(ent.text)
+        return {"skills": list(skills), "experience": list(experience), "location": list(location)}
+    except Exception:
+        return {"skills": [], "experience": [], "location": []}
+    # FINAL fallback, should never be hit, but guarantees a return value
+    return {"skills": [], "experience": [], "location": []}
 
 # --- Streamlit Theme ---
 st.set_page_config(
@@ -88,6 +104,8 @@ if section == "Job Seeker (Single Match)":
         st.progress(int(match_score))
         # NER and skills
         entities = extract_entities_from_text(resume_text)
+        if not entities:
+            entities = {"skills": [], "experience": [], "location": []}
         resume_skills = set([s.lower() for s in entities["skills"]])
         jd_skills = extract_skills_from_jd(jd_text_clean)
         matched_skills = sorted(resume_skills & jd_skills)
@@ -123,6 +141,8 @@ elif section == "Job Seeker (Batch Match)":
         resume_text = extract_text_from_file(resume_file)
         resume_text = clean_text(resume_text)
         entities = extract_entities_from_text(resume_text)
+        if not entities:
+            entities = {"skills": [], "experience": [], "location": []}
         resume_skills = set([s.lower() for s in entities["skills"]])
         results = []
         for jd_file in jd_files:
@@ -190,6 +210,8 @@ elif section == "Employer (Batch & Analytics)":
                     status = "Low Match"
                 # --- NER Extraction ---
                 entities = extract_entities_from_text(resume_text)
+                if not entities:
+                    entities = {"skills": [], "experience": [], "location": []}
                 resume_skills = set([s.lower() for s in entities["skills"]])
                 matched_skills = sorted(resume_skills & jd_skills)
                 missing_skills = sorted(jd_skills - resume_skills)
@@ -290,6 +312,8 @@ elif section == "Employer (Batch & Analytics)":
             resume_text = clean_text(resume_text)
             # --- NER Extraction for single resume ---
             entities = extract_entities_from_text(resume_text)
+            if not entities:
+                entities = {"skills": [], "experience": [], "location": []}
             resume_skills = set([s.lower() for s in entities["skills"]])
             st.markdown("**Extracted Skills:** " + ", ".join(entities["skills"]))
             st.markdown("**Extracted Experience:** " + ", ".join(entities["experience"]))
