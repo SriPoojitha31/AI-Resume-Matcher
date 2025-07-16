@@ -9,11 +9,16 @@ import spacy
 import subprocess
 import sys
 
-try:
-    spacy.load("en_core_web_sm")
-except OSError:
-    # Download the model if not present
-    subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
+def extract_entities_from_text(text):
+    try:
+        nlp = spacy.load('en_core_web_sm')
+    except OSError:
+        try:
+            subprocess.run([sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm', '--user'], check=True)
+            nlp = spacy.load('en_core_web_sm')
+        except Exception as e:
+            raise RuntimeError(f"Could not load or download spaCy model: {e}")
+    # ... rest of your function ...
 
 # --- Streamlit Theme ---
 st.set_page_config(
