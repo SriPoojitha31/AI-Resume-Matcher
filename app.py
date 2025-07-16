@@ -5,6 +5,15 @@ from utils.text_cleaning import clean_text
 from utils.file_utils import extract_entities_from_text, extract_skills_from_jd, generate_pdf_report
 import pandas as pd
 import io
+import spacy
+import subprocess
+import sys
+
+try:
+    spacy.load("en_core_web_sm")
+except OSError:
+    # Download the model if not present
+    subprocess.run([sys.executable, "-m", "spacy", "download", "en_core_web_sm"])
 
 # --- Streamlit Theme ---
 st.set_page_config(
