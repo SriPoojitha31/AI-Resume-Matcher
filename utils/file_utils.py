@@ -29,19 +29,24 @@ def extract_entities_from_text(text):
             subprocess.run([sys.executable, '-m', 'spacy', 'download', 'en_core_web_sm', '--user'], check=True)
             nlp = spacy.load('en_core_web_sm')
         except Exception as e:
-            raise RuntimeError(f"Could not load or download spaCy model: {e}")
-    doc = nlp(text)
-    skills = set()
-    experience = set()
-    location = set()
-    for ent in doc.ents:
-        if ent.label_ in ["SKILL", "SKILLS"]:
-            skills.add(ent.text)
-        elif ent.label_ in ["EXPERIENCE", "DATE"]:
-            experience.add(ent.text)
-        elif ent.label_ in ["GPE", "LOC", "LOCATION"]:
-            location.add(ent.text)
-    return {"skills": list(skills), "experience": list(experience), "location": list(location)}
+            # Return empty result if model cannot be loaded
+            return {"skills": [], "experience": [], "location": []}
+    try:
+        doc = nlp(text)
+        skills = set()
+        experience = set()
+        location = set()
+        for ent in doc.ents:
+            if ent.label_ in ["SKILL", "SKILLS"]:
+                skills.add(ent.text)
+            elif ent.label_ in ["EXPERIENCE", "DATE"]:
+                experience.add(ent.text)
+            elif ent.label_ in ["GPE", "LOC", "LOCATION"]:
+                location.add(ent.text)
+        return {"skills": list(skills), "experience": list(experience), "location": list(location)}
+    except Exception:
+        # If spaCy fails for any reason, return empty result
+        return {"skills": [], "experience": [], "location": []}
 
 # --- Extract skill keywords from JD text ---
 def extract_skills_from_jd(jd_text):

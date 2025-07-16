@@ -1,5 +1,6 @@
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
+import os
 
 def compute_similarity(resume_text, jd_text):
     texts = [resume_text, jd_text]
@@ -14,7 +15,16 @@ def compute_bert_similarity(resume_text, jd_text):
         from sentence_transformers import SentenceTransformer, util
     except ImportError:
         raise ImportError("Please install sentence-transformers: pip install sentence-transformers")
-    model = SentenceTransformer('all-MiniLM-L6-v2')
+    model_path = 'models/all-MiniLM-L6-v2'
+    if os.path.exists(model_path):
+        model = SentenceTransformer(model_path)
+    else:
+        model = SentenceTransformer('all-MiniLM-L6-v2')
+        try:
+            os.makedirs('models', exist_ok=True)
+            model.save(model_path)
+        except Exception:
+            pass  # If saving fails, just use the downloaded model
     embeddings = model.encode([resume_text, jd_text], convert_to_tensor=True)
     similarity = util.pytorch_cos_sim(embeddings[0], embeddings[1]).item()
     return round(similarity * 100, 2)
