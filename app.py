@@ -104,7 +104,7 @@ if section == "Job Seeker (Single Match)":
         st.progress(int(match_score))
         # NER and skills
         entities = extract_entities_from_text(resume_text)
-        if not entities:
+        if not isinstance(entities, dict) or "skills" not in entities:
             entities = {"skills": [], "experience": [], "location": []}
         resume_skills = set([s.lower() for s in entities["skills"]])
         jd_skills = extract_skills_from_jd(jd_text_clean)
@@ -141,7 +141,7 @@ elif section == "Job Seeker (Batch Match)":
         resume_text = extract_text_from_file(resume_file)
         resume_text = clean_text(resume_text)
         entities = extract_entities_from_text(resume_text)
-        if not entities:
+        if not isinstance(entities, dict) or "skills" not in entities:
             entities = {"skills": [], "experience": [], "location": []}
         resume_skills = set([s.lower() for s in entities["skills"]])
         results = []
@@ -210,7 +210,7 @@ elif section == "Employer (Batch & Analytics)":
                     status = "Low Match"
                 # --- NER Extraction ---
                 entities = extract_entities_from_text(resume_text)
-                if not entities:
+                if not isinstance(entities, dict) or "skills" not in entities:
                     entities = {"skills": [], "experience": [], "location": []}
                 resume_skills = set([s.lower() for s in entities["skills"]])
                 matched_skills = sorted(resume_skills & jd_skills)
@@ -312,7 +312,7 @@ elif section == "Employer (Batch & Analytics)":
             resume_text = clean_text(resume_text)
             # --- NER Extraction for single resume ---
             entities = extract_entities_from_text(resume_text)
-            if not entities:
+            if not isinstance(entities, dict) or "skills" not in entities:
                 entities = {"skills": [], "experience": [], "location": []}
             resume_skills = set([s.lower() for s in entities["skills"]])
             st.markdown("**Extracted Skills:** " + ", ".join(entities["skills"]))
