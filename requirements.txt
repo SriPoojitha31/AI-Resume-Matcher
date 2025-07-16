@@ -1,0 +1,11 @@
+streamlit
+pdfplumber
+scikit-learn
+numpy
+pandas
+spacy
+xlsxwriter
+python-docx
+PyMuPDF
+fpdf
+PyYAML

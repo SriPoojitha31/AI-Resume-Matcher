@@ -1,0 +1,20 @@
+credentials:
+  usernames:
+    admin:
+      email: admin@email.com
+      name: Employer Admin
+      password: $2b$12$KIXQ1eQ1eQ1eQ1eQ1eQ1eO1eQ1eQ1eQ1eQ1eQ1eQ1eQ1eQ1eQ1eQ1e  # example hash
+      role: Employer
+    seeker:
+      email: seeker@email.com
+      name: Job Seeker
+      password: $2b$12$KIXQ2eQ2eQ2eQ2eQ2eQ2eO2eQ2eQ2eQ2eQ2eQ2eQ2eQ2eQ2eQ2eQ2e  # example hash
+      role: Job Seeker
+cookie:
+  expiry_days: 1
+  key: resume_matcher_auth
+  name: resume_matcher_cookie
+preauthorized:
+  emails:
+    - admin@email.com
+    - seeker@email.com 
